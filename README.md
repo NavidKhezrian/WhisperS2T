@@ -22,7 +22,7 @@ Before installing **WhisperS2T**, ensure you have the following:
 ✅ **A compatible NVIDIA GPU** (for CUDA acceleration)\
 ✅ **NVIDIA CUDA Toolkit (12.1)** – [Download CUDA 12.1](https://developer.nvidia.com/cuda-12-1-0-download-archive)\
 ✅ **NVIDIA cuDNN Library (12.1)**\
-✅ **FFmpeg** installed
+✅ **FFmpeg** 
 
 ---
 
@@ -47,11 +47,7 @@ conda activate whisperS2T
 FFmpeg is required for audio processing. Install it based on your operating system:
 
 - **Windows:** [FFmpeg Installation Guide](https://phoenixnap.com/kb/ffmpeg-windows)
-- **Linux/macOS:** Use a package manager:
-  ```sh
-  sudo apt-get install ffmpeg  # Ubuntu/Debian
-  brew install ffmpeg          # macOS
-  ```
+
 
 **Verify installation:**
 
@@ -102,10 +98,4 @@ For advanced configurations, documentation, and further details, visit:\
 
 ---
 
-### ✅ Now you're ready to transcribe audio with **WhisperS2T**! 🚀
 
-If you run into any issues, feel free to open an issue or refer to the official documentation. 🎧🔊
-
----
-
-This **README** improves **clarity, structure, and user-friendliness**, making it easier to follow. Let me know if you need any additional refinements! 😊

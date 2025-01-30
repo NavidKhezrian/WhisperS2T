@@ -1,7 +1,0 @@
-conda create -n whisperS2T python=3.10 -y
-conda activate whisperS2T
-install ffmpeg based on the https://phoenixnap.com/kb/ffmpeg-windows
-test ffmpeg with run ffmpeg command
-install torch 2.1.2 ->  conda install pytorch=2.1.2 torchvision=0.16.2 torchaudio=2.1.2 pytorch-cuda=12.1 -c pytorch -c nvidia
-install cuda 12.1 ->  https://developer.nvidia.com/cuda-12-1-0-download-archive
-pip install -U whisper-s2t

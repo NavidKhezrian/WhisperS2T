@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper-Speech to Text</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .btn {
+            width: 150px;
+        }
+        textarea {
+            resize: none;
+            font-size: 16px;
+        }
+    </style>
+
+    <script>
+        let mediaRecorders = {};
+        let audioChunks = {};
+        let isRecording = {};
+
+        function toggleRecording(voiceID) {
+            if (!isRecording[voiceID]) {
+                startRecording(voiceID);
+            } else {
+                stopRecording(voiceID);
+            }
+        }
+
+        function startRecording(voiceID) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    let mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorders[voiceID] = mediaRecorder;
+                    audioChunks[voiceID] = [];
+
+                    mediaRecorder.start();
+                    isRecording[voiceID] = true;
+                    
+                    // Change button to Stop
+                    document.getElementById(`recordButton_${voiceID}`).innerText = "Stop Recording";
+                    document.getElementById(`recordButton_${voiceID}`).classList.remove("btn-success");
+                    document.getElementById(`recordButton_${voiceID}`).classList.add("btn-danger");
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks[voiceID].push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        isRecording[voiceID] = false;
+
+                        // Reset button back to Start
+                        document.getElementById(`recordButton_${voiceID}`).innerText = "Start Recording";
+                        document.getElementById(`recordButton_${voiceID}`).classList.remove("btn-danger");
+                        document.getElementById(`recordButton_${voiceID}`).classList.add("btn-success");
+
+                        const audioBlob = new Blob(audioChunks[voiceID], { type: 'audio/wav' });
+                        sendAudio(audioBlob, voiceID);
+                    };
+                })
+                .catch(error => console.error("Error accessing microphone: ", error));
+        }
+
+        function stopRecording(voiceID) {
+            if (mediaRecorders[voiceID]) {
+                mediaRecorders[voiceID].stop();
+            }
+        }
+
+        function sendAudio(audioBlob, voiceID) {
+            const formData = new FormData();
+            formData.append("audio", audioBlob, `recorded_audio_${voiceID}.wav`);
+
+            const selectedLanguage = document.getElementById("language").value;
+            formData.append("language", selectedLanguage);
+            formData.append("voice_id", voiceID);
+
+            fetch("/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`transcription_${data.voice_id}`).value = data.transcription;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center text-primary">🎤 Whisper-Speech to Text</h2>
+        
+        <!-- Language Selection -->
+        <div class="d-flex justify-content-center mt-3">
+            <label for="language" class="me-2"><strong>Choose Language:</strong></label>
+            <select id="language" class="form-select w-auto">
+                <option value="en">English</option>
+                <option value="de">German</option>
+            </select>
+        </div>
+
+        <!-- ID 1 -->
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">ID 1</h5>
+                <button id="recordButton_1" class="btn btn-success" onclick="toggleRecording(1)">Start Recording</button>
+                <textarea id="transcription_1" class="form-control mt-3" rows="3" placeholder="Transcription for ID 1 will appear here..." readonly></textarea>
+            </div>
+        </div>
+
+        <!-- ID 2 -->
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">ID 2</h5>
+                <button id="recordButton_2" class="btn btn-success" onclick="toggleRecording(2)">Start Recording</button>
+                <textarea id="transcription_2" class="form-control mt-3" rows="3" placeholder="Transcription for ID 2 will appear here..." readonly></textarea>
+            </div>
+        </div>
+
+        <!-- ID 3 -->
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">ID 3</h5>
+                <button id="recordButton_3" class="btn btn-success" onclick="toggleRecording(3)">Start Recording</button>
+                <textarea id="transcription_3" class="form-control mt-3" rows="3" placeholder="Transcription for ID 3 will appear here..." readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
